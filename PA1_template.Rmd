@@ -6,10 +6,29 @@ Sport Activity Analysis With Knitr
 ## Loading and preprocessing the data
 
 Since the data has to be loaded from a zipped file, 
-one would like to use unz()
+one would like to use unz().
+This way the  html file can be attained by only running 
+library(knitr) and knit2html("PA1_template.Rmd") from R.
 
+```{r}
+zipHandle<-unz("activity.zip", "activity.csv")
+rawData<-read.table(zipHandle, header=TRUE, sep=",")
+unlink(zipHandle)
+rm(zipHandle)
 
+```
 
+As preprocessing the second column will be converted in a POSIXlt type.
+Two other columns are also made in the right type 
+and a dataframe is made from this.
+
+```{r}
+date<-as.POSIXlt(rawData$date)
+steps<-as.integer(rawData$steps)
+interval<-as.factor(rawData$interval)
+dataFrame <- data.frame(date, interval, steps)
+rm(rawData)
+```
 
 ## What is mean total number of steps taken per day?
 
