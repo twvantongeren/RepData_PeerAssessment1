@@ -1,7 +1,13 @@
 # Reproducible Research: Peer Assessment 1
 
+Sport Activity Analysis With Knitr
+==================================
 
 ## Loading and preprocessing the data
+
+Since the data has to be loaded from a zipped file, 
+one would like to use unz()
+
 
 
 
