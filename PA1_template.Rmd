@@ -28,6 +28,9 @@ steps<-as.integer(rawData$steps)
 interval<-as.factor(rawData$interval)
 dataFrame <- data.frame(date, interval, steps)
 rm(rawData)
+rm(date)
+rm(interval)
+rm(steps)
 ```
 
 ## What is mean total number of steps taken per day?
