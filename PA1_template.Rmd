@@ -159,6 +159,86 @@ in the evening.
 
 ## Imputing missing values
 
+The total number of rows in the dataset with "NA" can be found by using sum()
+```{r}
+sum(is.na(df$steps))
+```
+Which thus is just a small part, since the whole dataset has 17568 rows.
+
+I would propose to fill all "NA"'s of one interval with the mean of that interval,
+since some days only have "NA" values, in which case it is not possible to
+calculate a mean.
+
+I will walk trough the df$steps list, and if I find a NA value, I will
+seek the time interval of that row.
+From there I will determine which mean in the "listOfMeansInterval" 
+corresponds to this interval and overwrite the "NA" value.
+
+After that I will just plot the dataframe in the same way as in part one of the assignment.
+
+```{r}
+
+# find the number of rows in the dataset
+numberOfRows = length(df$steps)
+
+# walk along every row
+for ( rowSelect in 1:numberOfRows )
+{
+    if ( is.na(df$steps[rowSelect]) )
+    {
+
+        # This block is executed if an NA is encountered
+
+        # One needs the interval
+        intervalIndex = as.character(df$interval[rowSelect])
+        index = as.integer(subset(listOfIntervals, listOfIntervals == intervalIndex))
+
+        # Overwrite the NA in the original array
+        df$steps[rowSelect] = listOfMeansInterval[index]
+    }
+
+}
+
+```
+From here I can do exactly the same as in assignment 2 in which I had to
+plot a histogram of the sum of all steps taken in one day, and report the mean and median.
+```{r}
+# repeat the important piece of code to calculate the mean and median
+# for every day
+
+# walk trough all the days and calculate properties for it
+for ( daySelect in 1:numberOfDays)
+{
+
+    # subset only one day of the set
+    dayData = subset(df, date == listOfDays[daySelect])
+
+    # calculate the mean and sum for one day
+    meanOfOneDay = mean(dayData$steps, na.rm = TRUE)
+    sumOfOneDay = sum(dayData$steps, na.rm = TRUE)
+    medianOfOneDay = median(dayData$steps, na.rm = TRUE)
+
+    # write the new mean and sum in the list
+    listOfMeans[[daySelect]] = meanOfOneDay
+    listOfSums[[daySelect]] = sumOfOneDay
+    listOfMedians[[daySelect]] = medianOfOneDay
+
+}
+
+# plot the histogram for the total number of steps
+hLabel = "Histogram of the total number of steps per day (NA's replaced)"
+hist(listOfSums, breaks = 10, xlab = "steps taken per day", main = hLabel)
+
+# report the mean and median for the total steps taken every day
+print(listOfMeans)
+print(listOfMedians)
+```
+The means do not have NaN values anymore which occured since for some
+days all values where NA.
+The NA values in the medians are all replaced by the same number, 34.11.
+The histogram has less values in the highest and the lowest regions, 
+more values are close the the mean.
+
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
