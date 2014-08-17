@@ -117,9 +117,7 @@ numberOfIntervals = length(listOfIntervals)
 # Every index is one day.
 listOfMeansInterval = as.numeric(matrix(NA, numberOfDays, 1))
 
-
-# one has to start with 1
-#intervalSelect = 1
+# walk along all intervals
 for ( intervalSelect in 1:numberOfIntervals )
 {
 
@@ -239,6 +237,76 @@ The NA values in the medians are all replaced by the same number, 34.11.
 The histogram has less values in the highest and the lowest regions, 
 more values are close the the mean.
 
-
-
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+This time I will do exactly the same as in part 3 but now I will subset the
+interval and also the weekday.
+
+```{r}
+isWeekend = factor(matrix(NA, numberOfIntervals, 1), level = c("weekday", "weekend"))
+wdf<-cbind(df, isWeekend)
+
+
+for ( rowSelect in 1:numberOfRows)
+{
+
+    weekDay = weekdays(df$date[rowSelect])
+    if (  weekDay ==  "zondag" | weekDay == "zaterdag" ) {
+        wdf$isWeekend[rowSelect] = "weekend"
+    }
+    else
+    {
+        wdf$isWeekend[rowSelect] = "weekday"
+    }
+
+}
+
+listOfMeansIntervalWeekday = as.numeric(matrix(NA, numberOfDays, 1))
+listOfMeansIntervalWeekend = as.numeric(matrix(NA, numberOfDays, 1))
+
+for (intervalSelect in 1:numberOfIntervals)
+{
+    
+    extractedTimeInterval = as.character(listOfIntervals[intervalSelect])
+    intervalDataWeekday = subset(wdf, wdf$interval == extractedTimeInterval & wdf$isWeekend =="weekday")
+    intervalDataWeekend = subset(wdf, wdf$interval == extractedTimeInterval & wdf$isWeekend == "weekend")
+    
+    meanOfOneIntervalWeekday = mean(intervalDataWeekday$steps, na.rm = TRUE)
+    meanOfOneIntervalWeekend = mean(intervalDataWeekend$steps, na.rm = TRUE)
+    
+    listOfMeansIntervalWeekday[[intervalSelect]] = meanOfOneIntervalWeekday
+    listOfMeansIntervalWeekend[[intervalSelect]] = meanOfOneIntervalWeekend
+    
+}
+
+xplotWeekend = as.numeric(matrix(NA, numberOfIntervals, 1))
+yplotWeekend = as.numeric(matrix(NA, numberOfIntervals, 1))
+
+for ( intervalSelect in 1:numberOfIntervals)
+{
+    xplotWeekend[[intervalSelect]] = as.character(listOfIntervals[intervalSelect])
+    yplotWeekend[[intervalSelect]] = listOfMeansIntervalWeekend[[intervalSelect]]
+}
+
+# plot(xplotWeekend, yplotWeekend, xlab = "Time on day (interval)", ylab = "Steps per 5 minutes" ,type = "l")
+
+xplotWeekday = as.numeric(matrix(NA, numberOfIntervals, 1))
+yplotWeekday = as.numeric(matrix(NA, numberOfIntervals, 1))
+
+for ( intervalSelect in 1:numberOfIntervals)
+{
+    xplotWeekday[[intervalSelect]] = as.character(listOfIntervals[intervalSelect])
+    yplotWeekday[[intervalSelect]] = listOfMeansIntervalWeekday[[intervalSelect]]
+}
+
+# plot(xplotWeekday, yplotWeekday, xlab = "Time on day (interval)", ylab = "Steps per 5 minutes" ,type = "l")
+
+par(mfrow=c(2,1))
+plot(xplotWeekend, yplotWeekend, xlab = "Time on day (interval)", ylab = "Steps per 5 minutes" ,type = "l", main = "Mean of number of steps in a weekend")
+plot(xplotWeekday, yplotWeekday, xlab = "Time on day (interval)", ylab = "Steps per 5 minutes" ,type = "l", main = "Mean of number of steps on a weekday")
+
+```
+
+It is clear that between 1000 and 1600 the person had less chance to excercise during the weekdays
+and more time for this in the weekend.
