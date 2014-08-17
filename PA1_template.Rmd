@@ -310,3 +310,4 @@ plot(xplotWeekday, yplotWeekday, xlab = "Time on day (interval)", ylab = "Steps 
 
 It is clear that between 1000 and 1600 the person had less chance to excercise during the weekdays
 and more time for this in the weekend.
+The peak in the morning seems to come from the fact that he can excercise before he goes to work.
