@@ -24,7 +24,7 @@ and a dataframe is made from this.
 ```{r}
 date<-as.POSIXct(rawData$date)
 steps<-as.integer(rawData$steps)
-interval<-as.factor(rawData$interval)
+interval<-as.character(rawData$interval)
 df <- data.frame(date, interval, steps)
 rm(rawData)
 rm(date)
@@ -99,17 +99,63 @@ print(listOfMedians)
 
 ```
 
-
 ## What is the average daily activity pattern?
 
 Calculating the average daily activity is essentially done in the same way as
 calculating the mean for every day.
-However a clock runs first to 60 minutes to before going to the next hour.
-For this one should next two for loops, one for the hours and one for the minutes.
+This time we iterate over all time intervals, and for every time interval we
+will have to go along all days to fetch the number of steps.
+This way we will find an array 
+
+```{r}
+# Make a list of all possible intervals, which are 12 per hour times 24 per day
+listOfIntervals = unique(df$interval)
+# Calculate the number of bins
+numberOfIntervals = length(listOfIntervals)
+
+# Array in which one element contains the number of steps for a specificInterval 
+# Every index is one day.
+listOfMeansInterval = as.numeric(matrix(NA, numberOfDays, 1))
 
 
+# one has to start with 1
+#intervalSelect = 1
+for ( intervalSelect in 1:numberOfIntervals )
+{
 
+   # subset only one time interval of the set
+   extractedTimeInterval = as.character(listOfIntervals[intervalSelect])
+   intervalData = subset(df, df$interval == extractedTimeInterval)
 
+   # calculate the mean and put it in the list of intervalMeans
+   meanOfOneInterval = mean(intervalData$steps, na.rm = TRUE)
+
+   # write the new mean in the list
+   listOfMeansInterval[[intervalSelect]] = meanOfOneInterval
+
+}
+
+# Now we are actually done, however I want to find every interval for every
+# selected interval
+
+xplot = as.numeric(matrix(NA, numberOfIntervals, 1))
+yplot = as.numeric(matrix(NA, numberOfIntervals, 1))
+
+for ( intervalSelect in 1:numberOfIntervals)
+{
+    xplot[[intervalSelect]] = as.character(listOfIntervals[intervalSelect])
+    yplot[[intervalSelect]] = listOfMeansInterval[[intervalSelect]]
+}
+
+# So now plot the figure
+plot(xplot, yplot, xlab = "Time on day (interval)", ylab = "Steps per 5 minutes" ,type = "l")
+
+```
+
+The report part should find the peak in this graph, which is around 835, 
+so maybe the person likes to walk every morning around 8:35.
+Also he seems to never do any sport before 5 AM in the morning and after 20:00
+in the evening.
 
 ## Imputing missing values
 
