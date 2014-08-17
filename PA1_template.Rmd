@@ -15,7 +15,6 @@ zipHandle<-unz("activity.zip", "activity.csv")
 rawData<-read.table(zipHandle, header=TRUE, sep=",")
 unlink(zipHandle)
 rm(zipHandle)
-
 ```
 
 As preprocessing the second column will be converted in a POSIXlt type.
@@ -23,10 +22,10 @@ Two other columns are also made in the right type
 and a dataframe is made from this.
 
 ```{r}
-date<-as.POSIXlt(rawData$date)
+date<-as.POSIXct(rawData$date)
 steps<-as.integer(rawData$steps)
 interval<-as.factor(rawData$interval)
-dataFrame <- data.frame(date, interval, steps)
+df <- data.frame(date, interval, steps)
 rm(rawData)
 rm(date)
 rm(interval)
@@ -34,10 +33,81 @@ rm(steps)
 ```
 
 ## What is mean total number of steps taken per day?
+The dataframe from the file (called df) has one column with dates.
+From this column a list of all the days the device was creating
+data can be compiled.
+Also the number of days the device was making data is determined.
 
+```{r}
+
+# first find out how many days the sensor was running
+startDate<-df$date[1]
+endDate<-df$date[length(df$date)]
+
+# make a list containing the days on which the device was on
+listOfDays = unique(df$date)
+
+# calculate the number of days the device was on
+numberOfDays = as.integer(length(listOfDays))
+
+```
+
+A for loop is used to evaluate for every day three required statistics, which are
+* The mean of all the steps for one day.
+* The sum of all the steps for one day.
+* The median of all the steps for one day.
+
+```{r}
+# create a list on which we will append a mean for every
+# run trough the for-loop
+listOfMeans = as.numeric(matrix(NA, numberOfDays, 1))
+listOfSums = as.numeric(matrix(NA, numberOfDays, 1))
+listOfMedians = as.numeric(matrix(NA,numberOfDays,1))
+
+# walk trough all the days and calculate properties for it
+for ( daySelect in 1:numberOfDays)
+{
+
+    # subset only one day of the set
+    dayData = subset(df, date == listOfDays[daySelect])
+
+    # calculate the mean and sum for one day
+    meanOfOneDay = mean(dayData$steps, na.rm = TRUE)
+    sumOfOneDay = sum(dayData$steps, na.rm = TRUE)
+    medianOfOneDay = median(dayData$steps, na.rm = TRUE)
+
+    # write the new mean and sum in the list
+    listOfMeans[[daySelect]] = meanOfOneDay
+    listOfSums[[daySelect]] = sumOfOneDay
+    listOfMedians[[daySelect]] = medianOfOneDay
+
+}
+
+```
+For the report part, it is important to see that the interval is actually
+registered every 5 minutes, thus the dimension of the mean table is in 
+"average number of steps per 5 minutes", which is also the case for the median values.
+The histogram is expressed in the total number of steps per day.
+```{r}
+# plot the histogram for the total number of steps
+hLabel = "Histogram of the total number of steps per day"
+hist(listOfSums, breaks = 10, xlab = "steps taken per day", main = hLabel)
+
+# report the mean and median for the total steps taken every day
+print(listOfMeans)
+print(listOfMedians)
+
+```
 
 
 ## What is the average daily activity pattern?
+
+Calculating the average daily activity is essentially done in the same way as
+calculating the mean for every day.
+However a clock runs first to 60 minutes to before going to the next hour.
+For this one should next two for loops, one for the hours and one for the minutes.
+
+
 
 
 
